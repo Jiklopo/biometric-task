@@ -43,7 +43,7 @@ class GetPersonSerializer(ModelSerializer):
         month = int(iin[2:4])
         day = int(iin[4:6])
         birth_date = datetime(year=year, month=month, day=day)
-        return (datetime.today() - birth_date).days // 365
+        return (datetime.today() - birth_date).days // 365.25
 
     def to_representation(self, instance):
         r = super().to_representation(instance)
