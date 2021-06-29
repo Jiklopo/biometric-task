@@ -1,7 +1,7 @@
+from .validators import validate_iin
 from django.db import models
 
 
-# Create your models here.
 class Restaurant(models.Model):
     id = models.BigAutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=128)
@@ -15,3 +15,8 @@ class Pizza(models.Model):
     cheese = models.CharField(max_length=128, blank=True)
     pastry = models.CharField(max_length=128, blank=True)
     secret_ingredient = models.CharField(max_length=128, blank=True)
+
+
+class Person(models.Model):
+    iin = models.CharField(primary_key=True, max_length=12, validators=[validate_iin])
+    age = 1

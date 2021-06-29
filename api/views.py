@@ -1,7 +1,12 @@
-from .models import Restaurant, Pizza
-from .serializers import RestaurantSerializer, PizzaSerializer
+from .models import Restaurant, Pizza, Person
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
+from .serializers import (
+    RestaurantSerializer,
+    PizzaSerializer,
+    GetPersonSerializer,
+    CreatePersonSerializer
+)
 
 
 class ListRestaurantsAPIView(generics.ListCreateAPIView):
@@ -30,3 +35,17 @@ class PizzaAPIView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         queryset = self.get_queryset()
         return get_object_or_404(queryset, id=self.kwargs['id'])
+
+
+class CreatePersonAPIView(generics.CreateAPIView):
+    serializer_class = CreatePersonSerializer
+    queryset = Person.objects.all()
+
+
+class RetrievePersonAPIView(generics.RetrieveAPIView):
+    serializer_class = GetPersonSerializer
+    queryset = Person.objects.all()
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, iin=self.kwargs['iin'])
