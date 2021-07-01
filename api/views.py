@@ -4,8 +4,7 @@ from django.shortcuts import get_object_or_404
 from .serializers import (
     RestaurantSerializer,
     PizzaSerializer,
-    GetPersonSerializer,
-    CreatePersonSerializer
+    PersonSerializer,
 )
 
 
@@ -38,12 +37,12 @@ class PizzaAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CreatePersonAPIView(generics.CreateAPIView):
-    serializer_class = CreatePersonSerializer
+    serializer_class = PersonSerializer
     queryset = Person.objects.all()
 
 
 class RetrievePersonAPIView(generics.RetrieveAPIView):
-    serializer_class = GetPersonSerializer
+    serializer_class = PersonSerializer
     queryset = Person.objects.all()
 
     def get_object(self):

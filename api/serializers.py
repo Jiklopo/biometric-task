@@ -23,13 +23,7 @@ class PizzaSerializer(ModelSerializer):
         ]
 
 
-class CreatePersonSerializer(ModelSerializer):
-    class Meta:
-        model = Person
-        fields = ['iin']
-
-
-class GetPersonSerializer(ModelSerializer):
+class PersonSerializer(ModelSerializer):
     def get_age(self, iin):
         century = iin[7]
         if century in ['1', '2']:
