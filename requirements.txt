@@ -2,3 +2,6 @@ django
 djangorestframework
 gunicorn
 django-heroku
+factory_boy
+pytest
+pytest-django
