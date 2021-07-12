@@ -7,7 +7,14 @@ from datetime import datetime
 class RestaurantSerializer(ModelSerializer):
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'address']
+        fields = [
+            'id',
+            'name',
+            'address',
+            'description',
+            'date_opened',
+            'rating'
+        ]
 
 
 class PizzaSerializer(ModelSerializer):
