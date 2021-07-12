@@ -1,4 +1,5 @@
-from ..models import Restaurant, Staff
+from ..models import Restaurant, Staff, Pizza
+from factory.fuzzy import FuzzyChoice
 import factory
 
 
@@ -12,15 +13,26 @@ class RestaurantFactory(factory.django.DjangoModelFactory):
 
 class StaffFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = 'api.Staff'
+        model = Staff
 
-    restaurant_id = 1
+    restaurant = factory.SubFactory(RestaurantFactory)
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     email = factory.LazyAttribute(
         lambda a: f'{a.first_name[0]}.{a.last_name}@biometric.kz'
     )
-    gender = Staff.GenderTextChoices.choices[0]
-    job = Staff.JobTextChoices.choices[0]
+    gender = FuzzyChoice(Staff.GenderTextChoices.choices)
+    job = FuzzyChoice(Staff.JobTextChoices.choices)
     birth_date = factory.Faker('date')
     date_joined = factory.Faker('date')
+
+
+class PizzaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Pizza
+
+    restaurant = factory.SubFactory(RestaurantFactory)
+    name = factory.Faker('first_name')
+    cheese = factory.Faker('last_name')
+    pastry = FuzzyChoice(['thin', 'thick'])
+    secret_ingredient = factory.Faker('name')
