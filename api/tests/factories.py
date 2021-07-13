@@ -1,5 +1,6 @@
 from ..models import Restaurant, Staff, Pizza
 from factory.fuzzy import FuzzyChoice
+from faker import Faker
 import factory
 
 
@@ -32,16 +33,23 @@ class StaffFactory(factory.django.DjangoModelFactory):
         if not restaurant:
             restaurant = RestaurantFactory()
 
-        instance = super().create(restaurant=restaurant, **kwargs)
-        return instance
+        return super().create(restaurant=restaurant, **kwargs)
 
 
 class PizzaFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Pizza
 
-    restaurant = factory.SubFactory(RestaurantFactory)
     name = factory.Faker('first_name')
     cheese = factory.Faker('last_name')
     pastry = FuzzyChoice(['thin', 'thick'])
     secret_ingredient = factory.Faker('name')
+
+    @classmethod
+    def create(cls, **kwargs):
+        restaurant = Restaurant.objects.order_by('?').first()
+
+        if not restaurant:
+            restaurant = RestaurantFactory()
+
+        return super().create(restaurant=restaurant, **kwargs)
