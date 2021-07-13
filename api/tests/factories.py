@@ -15,7 +15,6 @@ class StaffFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Staff
 
-    restaurant = factory.SubFactory(RestaurantFactory)
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     email = factory.LazyAttribute(
@@ -25,6 +24,16 @@ class StaffFactory(factory.django.DjangoModelFactory):
     job = FuzzyChoice(Staff.JobTextChoices.choices)
     birth_date = factory.Faker('date')
     date_joined = factory.Faker('date')
+
+    @classmethod
+    def create(cls, **kwargs):
+        restaurant = Restaurant.objects.order_by('?').first()
+
+        if not restaurant:
+            restaurant = RestaurantFactory()
+
+        instance = super().create(restaurant=restaurant, **kwargs)
+        return instance
 
 
 class PizzaFactory(factory.django.DjangoModelFactory):
