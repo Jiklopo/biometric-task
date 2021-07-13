@@ -5,3 +5,4 @@ django-heroku
 factory_boy
 pytest
 pytest-django
+drf-yasg
