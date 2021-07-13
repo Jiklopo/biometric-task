@@ -1,7 +1,5 @@
-from .models import Restaurant, Pizza, Person
-from rest_framework.serializers import Serializer, ModelSerializer
-from rest_framework import serializers
-from datetime import datetime
+from .models import Restaurant, Pizza, Staff
+from rest_framework.serializers import ModelSerializer
 
 
 class RestaurantSerializer(ModelSerializer):
@@ -30,7 +28,7 @@ class PizzaSerializer(ModelSerializer):
         ]
 
 
-class PersonSerializer(ModelSerializer):
+class StaffSerializer(ModelSerializer):
     class Meta:
-        model = Person
-        fields = ['iin', 'age']
+        model = Staff
+        fields = '__all__'

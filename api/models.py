@@ -55,24 +55,3 @@ class Pizza(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Person(models.Model):
-    iin = models.CharField(primary_key=True, max_length=12, validators=[validate_iin])
-
-    @property
-    def age(self):
-        'Returns persons age based on IIN'
-        century = self.iin[7]
-        if century in ['1', '2']:
-            year = 1800
-        elif century in ['3', '4']:
-            year = 1900
-        else:
-            year = 2000
-
-        year += int(self.iin[:2])
-        month = int(self.iin[2:4])
-        day = int(self.iin[4:6])
-        birth_date = datetime(year=year, month=month, day=day)
-        return (datetime.today() - birth_date).days // 365.25
