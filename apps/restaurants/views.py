@@ -4,14 +4,9 @@ from rest_framework.views import APIView
 
 from rest_framework import serializers, exceptions, status
 
-from .models import Restaurant, Pizza, Staff
+from .models import Restaurant
 from .selectors import restaurants_list
-from .serializers import (
-    RestaurantSerializer,
-    PizzaSerializer,
-    StaffSerializer
-)
-from ..services import create_restaurant, update_restaurant, delete_restaurant
+from .services import create_restaurant, update_restaurant, delete_restaurant
 
 
 class RestaurantsListApi(APIView):

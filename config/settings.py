@@ -23,7 +23,10 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.restaurants'
+    'apps.restaurants',
+    'apps.pizzas',
+    'apps.staff',
+    'apps.persons',
 ]
 
 INSTALLED_APPS = [
@@ -66,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'biometric_task.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
