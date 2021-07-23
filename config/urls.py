@@ -18,11 +18,15 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
+apipatterns = [
     path('restaurants/', include('apps.restaurants.urls')),
     path('pizzas/', include('apps.pizzas.urls')),
     path('staff/', include('apps.staff.urls')),
+]
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(apipatterns)),
 
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
