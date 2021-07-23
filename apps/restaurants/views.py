@@ -48,7 +48,7 @@ class RestaurantCreateApi(APIView):
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        restaurant = create_restaurant(**serializer.data)
+        restaurant = create_restaurant(**serializer.validated_data)
         response = self.OutputSerializer(instance=restaurant)
         return Response(data=response.data, status=status.HTTP_201_CREATED)
 
@@ -69,7 +69,7 @@ class RestaurantUpdateApi(APIView):
     def put(self, request: Request):
         serializer = self.InputSerializer(request.data)
         serializer.is_valid(raise_exception=True)
-        r = update_restaurant(**serializer.data)
+        r = update_restaurant(**serializer.validated_data)
         response_data = self.OutputSerializer(instance=r).data
         return Response(data=response_data, status=status.HTTP_200_OK)
 
@@ -84,38 +84,8 @@ class RestaurantDeleteApi(APIView):
     def delete(self, request: Request):
         serializer = self.InputSerializer(request.data)
         serializer.is_valid(raise_exception=True)
-        restaurant_id = serializer.data.get('id')
+        restaurant_id = serializer.validated_data.get('id')
         if not restaurant_id:
             raise exceptions.NotAcceptable
         delete_restaurant(restaurant_id=restaurant_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class ListRestaurantsAPIView(generics.ListCreateAPIView):
-    serializer_class = RestaurantSerializer
-    queryset = Restaurant.objects.all()
-
-
-class RestaurantAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = RestaurantSerializer
-    queryset = Restaurant.objects.all()
-
-
-class ListPizzasAPIView(generics.ListCreateAPIView):
-    serializer_class = PizzaSerializer
-    queryset = Pizza.objects.all()
-
-
-class PizzaAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = PizzaSerializer
-    queryset = Pizza.objects.all()
-
-
-class ListStaffAPIView(generics.ListCreateAPIView):
-    serializer_class = StaffSerializer
-    queryset = Staff.objects.all()
-
-
-class StaffAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = StaffSerializer
-    queryset = Staff.objects.all()
