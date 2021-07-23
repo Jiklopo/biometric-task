@@ -15,13 +15,13 @@ def create_staff(**kwargs):
     return Staff.objects.create(**kwargs)
 
 
-def update_staff(*, staff_id, **kwargs):
-    staff = get_staff(staff_id=staff_id)
+def update_staff(*, staff_iin, **kwargs):
+    staff = get_staff(staff_iin=staff_iin)
     return update_model(model=staff, **kwargs)
 
 
-def delete_staff(*, staff_id):
-    staff = get_staff(staff_id=staff_id)
+def delete_staff(*, staff_iin):
+    staff = get_staff(staff_iin=staff_iin)
     staff.delete()
 
 
