@@ -1,9 +1,11 @@
 from rest_framework import exceptions
-
+from faker import Faker
+from random import randint
 from datetime import date
 
 from apps.staff.models import Staff
 from apps.staff.selectors import get_staff
+from apps.utils import update_model
 
 
 def create_staff(**kwargs):
@@ -15,13 +17,34 @@ def create_staff(**kwargs):
 
 def update_staff(*, staff_id, **kwargs):
     staff = get_staff(staff_id=staff_id)
-    staff.update(**kwargs)
-    return staff
+    return update_model(model=staff, **kwargs)
 
 
 def delete_staff(*, staff_id):
     staff = get_staff(staff_id=staff_id)
     staff.delete()
+
+
+def generate_iin() -> str:
+    faker = Faker()
+    date = ''.join(faker.date()[2:].split('-'))
+    century = randint(3, 6)
+    rand = faker.bothify('%' * 4)
+
+    iin = f'{date}{century}{rand}'
+
+    twelve_one = str(sum(int(iin[i]) * (i + 1) for i in range(11)) % 11)
+    twelve_two = sum(int(iin[i + 1]) * i for i in range(1, 10))
+    twelve_two_expr = 10 * int(iin[0]) + 11 * int(iin[1])
+    twelve_two_total = str((twelve_two + twelve_two_expr) % 11)
+
+    if int(twelve_one) != 10:
+        iin += twelve_one
+        return iin
+
+    if int(twelve_two_total) != 10:
+        iin += twelve_two_total
+        return iin
 
 
 def validate_iin(iin):

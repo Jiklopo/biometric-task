@@ -1,6 +1,8 @@
 from rest_framework import exceptions
 
 from apps.pizzas.models import Pizza
+from apps.pizzas.selectors import get_pizza
+from apps.utils import update_model
 
 
 def create_pizza(**kwargs):
@@ -8,16 +10,10 @@ def create_pizza(**kwargs):
 
 
 def update_pizza(*, pizza_id: int, **kwargs):
-    try:
-        pizza = Pizza.objects.get(id=pizza_id)
-        pizza.update(**kwargs)
-        return pizza
-    except Pizza.DoesNotExist:
-        raise exceptions.NotFound
+    pizza = get_pizza(pizza_id=pizza_id)
+    return update_model(model=pizza, **kwargs)
 
 
 def delete_pizza(*, pizza_id: int):
-    try:
-        Pizza.objects.get(id=pizza_id).delete()
-    except Pizza.DoesNotExist:
-        raise exceptions.NotFound
+    pizza = get_pizza(pizza_id=pizza_id)
+    pizza.delete()

@@ -1,21 +1,16 @@
 from rest_framework import exceptions
 from apps.restaurants.models import Restaurant
+from apps.restaurants.selectors import get_restaurant
+from apps.utils import update_model
 
 
 def create_restaurant(**kwargs):
     return Restaurant.objects.create(**kwargs)
 
 
-def update_restaurant(**kwargs):
-    if 'id' not in kwargs:
-        raise exceptions.NotFound
-
-    try:
-        r = Restaurant.objects.get(id=kwargs['id'])
-        r.update(**kwargs)
-    except Restaurant.DoesNotExist:
-        raise exceptions.NotFound
-    return r
+def update_restaurant(*, restaurant_id, **kwargs):
+    restaurant = get_restaurant(restaurant_id=restaurant_id)
+    return update_model(model=restaurant, **kwargs)
 
 
 def delete_restaurant(*, restaurant_id: int):
