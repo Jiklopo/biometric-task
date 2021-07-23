@@ -1,8 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from rest_framework import serializers, status
 
-from rest_framework import serializers, exceptions, status
+from drf_yasg.utils import swagger_auto_schema
 
 from .models import Restaurant
 from .selectors import restaurants_list
@@ -16,6 +17,7 @@ class RestaurantsListApi(APIView):
             model = Restaurant
             fields = '__all__'
 
+    @swagger_auto_schema(operation_description='List Restaurants')
     def get(self, request: Request):
         restaurants = restaurants_list()
         data = self.OutputSerializer(restaurants, many=True).data
@@ -40,6 +42,10 @@ class RestaurantCreateApi(APIView):
             model = Restaurant
             fields = '__all__'
 
+    @swagger_auto_schema(
+        operation_description='Create Restaurant',
+        request_body=InputSerializer
+    )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -53,34 +59,32 @@ class RestaurantUpdateApi(APIView):
         class Meta:
             ref_name = 'RestaurantUpdateInputSerializer'
             model = Restaurant
-            fields = '__all__'
+            fields = [
+                'name',
+                'description',
+                'rating'
+            ]
 
     class OutputSerializer(serializers.ModelSerializer):
         class Meta:
             ref_name = 'RestaurantUpdateOutputSerializer'
             model = Restaurant
-            fields = ['id']
+            fields = '__all__'
 
-    def put(self, request: Request):
-        serializer = self.InputSerializer(request.data)
+    @swagger_auto_schema(
+        operation_description='Update Restaurant',
+        request_body=InputSerializer
+    )
+    def put(self, request: Request, id):
+        serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        r = update_restaurant(**serializer.validated_data)
+        r = update_restaurant(restaurant_id=id, **serializer.validated_data)
         response_data = self.OutputSerializer(instance=r).data
         return Response(data=response_data, status=status.HTTP_200_OK)
 
 
 class RestaurantDeleteApi(APIView):
-    class InputSerializer(serializers.ModelSerializer):
-        class Meta:
-            ref_name = 'RestaurantDeleteInputSerializer'
-            model = Restaurant
-            fields = ['id']
-
-    def delete(self, request: Request):
-        serializer = self.InputSerializer(request.data)
-        serializer.is_valid(raise_exception=True)
-        restaurant_id = serializer.validated_data.get('id')
-        if not restaurant_id:
-            raise exceptions.NotAcceptable
-        delete_restaurant(restaurant_id=restaurant_id)
+    @swagger_auto_schema(operation_description='Delete Restaurant')
+    def delete(self, request: Request, id):
+        delete_restaurant(restaurant_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)

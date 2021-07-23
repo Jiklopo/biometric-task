@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from rest_framework import serializers, status
 
+from apps.staff import JobTextChoices, GenderTextChoices
 from apps.staff.models import Staff
 from apps.staff.selectors import list_staff
 from apps.staff.services import create_staff, update_staff, delete_staff
@@ -11,6 +12,8 @@ from apps.staff.services import create_staff, update_staff, delete_staff
 
 class StaffListApi(APIView):
     class OutputSerializer(serializers.ModelSerializer):
+        age = serializers.ReadOnlyField()
+
         class Meta:
             ref_name = 'StaffListOutputSerializer'
             model = Staff
@@ -29,7 +32,7 @@ class StaffCreateApi(APIView):
             model = Staff
             fields = [
                 'iin',
-                'restaurant_id',
+                'restaurant',
                 'first_name',
                 'last_name',
                 'gender',
@@ -39,13 +42,15 @@ class StaffCreateApi(APIView):
             ]
 
     class OutputSerializer(serializers.ModelSerializer):
+        age = serializers.ReadOnlyField()
+
         class Meta:
             ref_name = 'StaffCreateOutputSerializer'
             model = Staff
-            fields = ['iin']
+            fields = '__all__'
 
     def post(self, request: Request):
-        serializer = self.InputSerializer(request.data)
+        serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         staff = create_staff(**serializer.validated_data)
         response_data = self.OutputSerializer(instance=staff).data
@@ -53,36 +58,32 @@ class StaffCreateApi(APIView):
 
 
 class StaffUpdateApi(APIView):
-    class InputSerializer(serializers.ModelSerializer):
+    class InputSerializer(serializers.Serializer):
+        restaurant = serializers.IntegerField(required=False)
+        job = serializers.ChoiceField(JobTextChoices.choices, required=False)
+        gender = serializers.ChoiceField(GenderTextChoices.choices, required=False)
+
         class Meta:
             ref_name = 'StaffUpdateInputSerializer'
-            model = Staff
-            fields = ['id', 'restaurant_id', 'job', 'email']
 
     class OutputSerializer(serializers.ModelSerializer):
+        age = serializers.ReadOnlyField()
+
         class Meta:
             ref_name = 'StaffUpdateOutputSerializer'
             model = Staff
-            fields = ['id']
+            fields = '__all__'
 
-    def put(self, request: Request):
-        serializer = self.InputSerializer(request.data)
+    def put(self, request: Request, iin):
+        serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        staff_id = serializer.validated_data.pop('id')
-        staff = update_staff(staff_id=staff_id, **serializer.validated_data)
-        response_data = self.OutputSerializer(instance=staff)
+        restaurant_id = serializer.validated_data.pop('restaurant', None)
+        staff = update_staff(staff_iin=iin, restaurant_id=restaurant_id, **serializer.validated_data)
+        response_data = self.OutputSerializer(instance=staff).data
         return Response(data=response_data)
 
 
 class StaffDeleteApi(APIView):
-    class InputSerializer(serializers.ModelSerializer):
-        class Meta:
-            ref_name = 'StaffDeleteInputSerializer'
-            model = Staff
-            fields = ['id']
-
-    def delete(self, request: Request):
-        serializer = self.InputSerializer(request.data)
-        serializer.is_valid(raise_exception=True)
-        delete_staff(staff_id=serializer.validated_data.get('id'))
+    def delete(self, request: Request, iin):
+        delete_staff(staff_iin=iin)
         return Response(status=status.HTTP_204_NO_CONTENT)
