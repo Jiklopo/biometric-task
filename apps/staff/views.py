@@ -20,7 +20,10 @@ class StaffListApi(APIView):
             model = Staff
             fields = '__all__'
 
-    @swagger_auto_schema(operation_description='List Staff')
+    @swagger_auto_schema(
+        operation_description='List Staff',
+        responses={200: OutputSerializer}
+    )
     def get(self, request: Request):
         staff = list_staff()
         serializer = self.OutputSerializer(instance=staff, many=True)
@@ -53,7 +56,8 @@ class StaffCreateApi(APIView):
 
     @swagger_auto_schema(
         operation_description='Create Staff',
-        request_body=InputSerializer
+        request_body=InputSerializer,
+        responses={201: OutputSerializer}
     )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -82,9 +86,10 @@ class StaffUpdateApi(APIView):
 
     @swagger_auto_schema(
         operation_description='Update Staff',
-        request_body=InputSerializer
+        request_body=InputSerializer,
+        responses={200: OutputSerializer}
     )
-    def put(self, request: Request, iin):
+    def post(self, request: Request, iin):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         restaurant_id = serializer.validated_data.pop('restaurant', None)
@@ -94,7 +99,10 @@ class StaffUpdateApi(APIView):
 
 
 class StaffDeleteApi(APIView):
-    @swagger_auto_schema(operation_description='Delete Staff')
+    @swagger_auto_schema(
+        operation_description='Delete Staff',
+        responses={204: None}
+    )
     def delete(self, request: Request, iin):
         delete_staff(staff_iin=iin)
         return Response(status=status.HTTP_204_NO_CONTENT)

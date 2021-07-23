@@ -17,7 +17,10 @@ class RestaurantsListApi(APIView):
             model = Restaurant
             fields = '__all__'
 
-    @swagger_auto_schema(operation_description='List Restaurants')
+    @swagger_auto_schema(
+        operation_description='List Restaurants',
+        responses={200: OutputSerializer}
+    )
     def get(self, request: Request):
         restaurants = restaurants_list()
         data = self.OutputSerializer(restaurants, many=True).data
@@ -44,7 +47,8 @@ class RestaurantCreateApi(APIView):
 
     @swagger_auto_schema(
         operation_description='Create Restaurant',
-        request_body=InputSerializer
+        request_body=InputSerializer,
+        responses={201: OutputSerializer}
     )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -73,9 +77,10 @@ class RestaurantUpdateApi(APIView):
 
     @swagger_auto_schema(
         operation_description='Update Restaurant',
-        request_body=InputSerializer
+        request_body=InputSerializer,
+        responses={200: OutputSerializer}
     )
-    def put(self, request: Request, id):
+    def post(self, request: Request, id):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         r = update_restaurant(restaurant_id=id, **serializer.validated_data)
@@ -84,7 +89,10 @@ class RestaurantUpdateApi(APIView):
 
 
 class RestaurantDeleteApi(APIView):
-    @swagger_auto_schema(operation_description='Delete Restaurant')
+    @swagger_auto_schema(
+        operation_description='Delete Restaurant',
+        responses={204: None}
+    )
     def delete(self, request: Request, id):
         delete_restaurant(restaurant_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -17,7 +17,10 @@ class PizzaListApi(APIView):
             model = Pizza
             fields = '__all__'
 
-    @swagger_auto_schema(operation_description='List Pizzas')
+    @swagger_auto_schema(
+        operation_description='List Pizzas',
+        responses={200: OutputSerializer}
+    )
     def get(self, request: Request):
         pizzas = list_pizzas()
         serializer = self.OutputSerializer(instance=pizzas, many=True)
@@ -39,7 +42,8 @@ class PizzaCreateApi(APIView):
 
     @swagger_auto_schema(
         operation_description='Create Pizza',
-        request_body=InputSerializer
+        request_body=InputSerializer,
+        responses={201: OutputSerializer}
     )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -64,9 +68,10 @@ class PizzaUpdateApi(APIView):
 
     @swagger_auto_schema(
         operation_description='Update Pizza',
-        request_body=InputSerializer
+        request_body=InputSerializer,
+        responses={200: OutputSerializer}
     )
-    def put(self, request: Request, id):
+    def post(self, request: Request, id):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         pizza = update_pizza(pizza_id=id, **serializer.validated_data)
@@ -75,7 +80,10 @@ class PizzaUpdateApi(APIView):
 
 
 class PizzaDeleteApi(APIView):
-    @swagger_auto_schema(operation_description='Delete Pizza')
+    @swagger_auto_schema(
+        operation_description='Delete Pizza',
+        responses={204: None}
+    )
     def delete(self, request: Request, id):
         delete_pizza(pizza_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)
