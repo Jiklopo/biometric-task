@@ -91,7 +91,7 @@ class RestaurantUpdateApi(APIView):
 class RestaurantDeleteApi(APIView):
     @swagger_auto_schema(
         operation_description='Delete Restaurant',
-        responses={204: None}
+        responses={204: ''}
     )
     def delete(self, request: Request, id):
         delete_restaurant(restaurant_id=id)

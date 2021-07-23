@@ -82,7 +82,7 @@ class PizzaUpdateApi(APIView):
 class PizzaDeleteApi(APIView):
     @swagger_auto_schema(
         operation_description='Delete Pizza',
-        responses={204: None}
+        responses={204: ''}
     )
     def delete(self, request: Request, id):
         delete_pizza(pizza_id=id)
