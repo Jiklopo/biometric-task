@@ -11,7 +11,6 @@ def test_email(create_staff):
 
 
 def test_birth_date(create_staff):
-    create_staff
     create_staff.birth_date = dt.date.today() + dt.timedelta(days=1)
     with pytest.raises(ValidationError):
         create_staff.full_clean()

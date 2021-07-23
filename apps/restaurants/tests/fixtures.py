@@ -1,4 +1,4 @@
-from api.tests.factories import RestaurantFactory, StaffFactory
+from apps.restaurants.tests.factories import RestaurantFactory, StaffFactory
 import pytest
 
 
