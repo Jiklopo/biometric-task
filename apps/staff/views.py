@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -19,6 +20,7 @@ class StaffListApi(APIView):
             model = Staff
             fields = '__all__'
 
+    @swagger_auto_schema(operation_description='List Staff')
     def get(self, request: Request):
         staff = list_staff()
         serializer = self.OutputSerializer(instance=staff, many=True)
@@ -49,6 +51,10 @@ class StaffCreateApi(APIView):
             model = Staff
             fields = '__all__'
 
+    @swagger_auto_schema(
+        operation_description='Create Staff',
+        request_body=InputSerializer
+    )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -74,6 +80,10 @@ class StaffUpdateApi(APIView):
             model = Staff
             fields = '__all__'
 
+    @swagger_auto_schema(
+        operation_description='Update Staff',
+        request_body=InputSerializer
+    )
     def put(self, request: Request, iin):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -84,6 +94,7 @@ class StaffUpdateApi(APIView):
 
 
 class StaffDeleteApi(APIView):
+    @swagger_auto_schema(operation_description='Delete Staff')
     def delete(self, request: Request, iin):
         delete_staff(staff_iin=iin)
         return Response(status=status.HTTP_204_NO_CONTENT)
