@@ -7,6 +7,7 @@ from . import GenderTextChoices, JobTextChoices
 
 # Create your models here.
 class Staff(models.Model):
+    iin = models.CharField(max_length=12, primary_key=True)
     restaurant = models.ForeignKey('restaurants.Restaurant', on_delete=models.CASCADE)
 
     first_name = models.CharField(max_length=128)
@@ -32,3 +33,7 @@ class Staff(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}({self.id})@{self.restaurant}'
+
+    @property
+    def age(self):
+        return (date.today() - self.birth_date).days // 365.25

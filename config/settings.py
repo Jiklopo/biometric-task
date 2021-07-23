@@ -26,7 +26,6 @@ LOCAL_APPS = [
     'apps.restaurants',
     'apps.pizzas',
     'apps.staff',
-    'apps.persons',
 ]
 
 INSTALLED_APPS = [

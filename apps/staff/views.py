@@ -1,3 +1,88 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-# Create your views here.
+from rest_framework import serializers, status
+
+from apps.staff.models import Staff
+from apps.staff.selectors import list_staff
+from apps.staff.services import create_staff, update_staff, delete_staff
+
+
+class StaffListApi(APIView):
+    class OutputSerializer(serializers.ModelSerializer):
+        class Meta:
+            ref_name = 'StaffListOutputSerializer'
+            model = Staff
+            fields = '__all__'
+
+    def get(self, request: Request):
+        staff = list_staff()
+        serializer = self.OutputSerializer(instance=staff, many=True)
+        return Response(data=serializer.data)
+
+
+class StaffCreateApi(APIView):
+    class InputSerializer(serializers.ModelSerializer):
+        class Meta:
+            ref_name = 'StaffCreateInputSerializer'
+            model = Staff
+            fields = [
+                'iin',
+                'restaurant_id',
+                'first_name',
+                'last_name',
+                'gender',
+                'job',
+                'email',
+                'date_joined'
+            ]
+
+    class OutputSerializer(serializers.ModelSerializer):
+        class Meta:
+            ref_name = 'StaffCreateOutputSerializer'
+            model = Staff
+            fields = ['iin']
+
+    def post(self, request: Request):
+        serializer = self.InputSerializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        staff = create_staff(**serializer.validated_data)
+        response_data = self.OutputSerializer(instance=staff).data
+        return Response(data=response_data, status=status.HTTP_201_CREATED)
+
+
+class StaffUpdateApi(APIView):
+    class InputSerializer(serializers.ModelSerializer):
+        class Meta:
+            ref_name = 'StaffUpdateInputSerializer'
+            model = Staff
+            fields = ['id', 'restaurant_id', 'job', 'email']
+
+    class OutputSerializer(serializers.ModelSerializer):
+        class Meta:
+            ref_name = 'StaffUpdateOutputSerializer'
+            model = Staff
+            fields = ['id']
+
+    def put(self, request: Request):
+        serializer = self.InputSerializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        staff_id = serializer.validated_data.pop('id')
+        staff = update_staff(staff_id=staff_id, **serializer.validated_data)
+        response_data = self.OutputSerializer(instance=staff)
+        return Response(data=response_data)
+
+
+class StaffDeleteApi(APIView):
+    class InputSerializer(serializers.ModelSerializer):
+        class Meta:
+            ref_name = 'StaffDeleteInputSerializer'
+            model = Staff
+            fields = ['id']
+
+    def delete(self, request: Request):
+        serializer = self.InputSerializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        delete_staff(staff_id=serializer.validated_data.get('id'))
+        return Response(status=status.HTTP_204_NO_CONTENT)
