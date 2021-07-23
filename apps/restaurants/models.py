@@ -16,8 +16,9 @@ class Restaurant(models.Model):
     def clean(self):
         if not 0 <= self.rating <= 5:
             raise ValidationError('Rating must be between 0 and 5!')
-        if (date.today() - self.date_opened).days < 0:
-            raise ValidationError('Opening Date cannot be in the futures!')
+        if self.date_opened:
+            if (date.today() - self.date_opened).days < 0:
+                raise ValidationError('Opening Date cannot be in the futures!')
 
     def save(self, *args, **kwargs):
         self.full_clean()
