@@ -15,10 +15,14 @@ class PizzaFactory(factory.django.DjangoModelFactory):
     secret_ingredient = factory.Faker('word')
 
     @classmethod
-    def create(cls, **kwargs):
+    def build(cls, **kwargs):
         restaurant = Restaurant.objects.order_by('?').first()
 
         if not restaurant:
             restaurant = RestaurantFactory()
 
-        return super().create(restaurant=restaurant, **kwargs)
+        return super().build(restaurant=restaurant, **kwargs)
+
+    @classmethod
+    def create(cls, **kwargs):
+        return super().build(**kwargs)

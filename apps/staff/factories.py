@@ -22,6 +22,15 @@ class StaffFactory(factory.django.DjangoModelFactory):
     date_joined = factory.Faker('past_date')
 
     @classmethod
+    def build(cls, **kwargs):
+        restaurant = Restaurant.objects.order_by('?').first()
+
+        if not restaurant:
+            restaurant = RestaurantFactory()
+
+        return super().build(restaurant=restaurant, **kwargs)
+
+    @classmethod
     def create(cls, **kwargs):
         restaurant = Restaurant.objects.order_by('?').first()
 
