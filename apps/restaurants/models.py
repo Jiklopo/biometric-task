@@ -5,9 +5,16 @@ from rest_framework.exceptions import ValidationError
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=128)
-    address = models.CharField(max_length=128, blank=True)
+    address = models.CharField(
+        max_length=128,
+        blank=True,
+        default=''
+    )
 
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True,
+        default=''
+    )
 
     date_opened = models.DateField(null=True)
 
