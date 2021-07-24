@@ -5,7 +5,9 @@ from apps.utils import update_model
 
 
 def create_restaurant(**kwargs):
-    return Restaurant.objects.create(**kwargs)
+    restaurant = Restaurant(**kwargs)
+    restaurant.save()
+    return restaurant
 
 
 def update_restaurant(*, restaurant_id, **kwargs):
@@ -13,8 +15,5 @@ def update_restaurant(*, restaurant_id, **kwargs):
     return update_model(model=restaurant, **kwargs)
 
 
-def delete_restaurant(*, restaurant_id: int):
-    try:
-        Restaurant.objects.get(id=restaurant_id).delete()
-    except Restaurant.DoesNotExist:
-        raise exceptions.NotFound
+def delete_restaurant(*, restaurant: Restaurant):
+    restaurant.delete()
