@@ -5,9 +5,10 @@ from rest_framework.response import Response
 
 from rest_framework import serializers, status
 
+from apps.restaurants.selectors import get_restaurant
 from apps.staff import JobTextChoices, GenderTextChoices
 from apps.staff.models import Staff
-from apps.staff.selectors import list_staff
+from apps.staff.selectors import list_staff, get_staff
 from apps.staff.services import create_staff, update_staff, delete_staff
 
 
@@ -31,20 +32,18 @@ class StaffListApi(APIView):
 
 
 class StaffCreateApi(APIView):
-    class InputSerializer(serializers.ModelSerializer):
+    class InputSerializer(serializers.Serializer):
+        iin = serializers.CharField(max_length=12)
+        restaurant = serializers.IntegerField()
+        first_name = serializers.CharField(max_length=128)
+        last_name = serializers.CharField(max_length=128)
+        gender = serializers.ChoiceField(choices=GenderTextChoices)
+        job = serializers.ChoiceField(choices=JobTextChoices)
+        email = serializers.EmailField()
+        date_joined = serializers.DateField()
+
         class Meta:
             ref_name = 'StaffCreateInputSerializer'
-            model = Staff
-            fields = [
-                'iin',
-                'restaurant',
-                'first_name',
-                'last_name',
-                'gender',
-                'job',
-                'email',
-                'date_joined'
-            ]
 
     class OutputSerializer(serializers.ModelSerializer):
         age = serializers.ReadOnlyField()
@@ -62,7 +61,11 @@ class StaffCreateApi(APIView):
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        staff = create_staff(**serializer.validated_data)
+
+        restaurant = get_restaurant(restaurant_id=serializer.validated_data.pop('restaurant'))
+        iin = serializer.validated_data.pop('iin', None)
+        staff = create_staff(iin=iin, restaurant=restaurant, **serializer.validated_data)
+
         response_data = self.OutputSerializer(instance=staff).data
         return Response(data=response_data, status=status.HTTP_201_CREATED)
 
@@ -92,8 +95,14 @@ class StaffUpdateApi(APIView):
     def post(self, request: Request, iin):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        restaurant_id = serializer.validated_data.pop('restaurant', None)
-        staff = update_staff(staff_iin=iin, restaurant_id=restaurant_id, **serializer.validated_data)
+        staff = get_staff(staff_iin=iin)
+
+        data = {}
+        if 'restaurant' in serializer.validated_data:
+            data['restaurant'] = get_restaurant(restaurant_id=serializer.validated_data.pop('restaurant'))
+
+        data.update(serializer.validated_data)
+        staff = update_staff(staff=staff, **data)
         response_data = self.OutputSerializer(instance=staff).data
         return Response(data=response_data)
 
@@ -104,5 +113,6 @@ class StaffDeleteApi(APIView):
         responses={204: ''}
     )
     def delete(self, request: Request, iin):
-        delete_staff(staff_iin=iin)
+        staff = get_staff(staff_iin=iin)
+        delete_staff(staff=staff)
         return Response(status=status.HTTP_204_NO_CONTENT)

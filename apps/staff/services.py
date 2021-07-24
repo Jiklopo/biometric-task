@@ -4,24 +4,22 @@ from random import randint
 from datetime import date
 
 from apps.staff.models import Staff
-from apps.staff.selectors import get_staff
 from apps.utils import update_model
 
 
-def create_staff(**kwargs):
-    iin = kwargs.get('iin')
+def create_staff(*, iin: str, **kwargs):
     validate_iin(iin)
     kwargs['birth_date'] = birth_date_from_iin(iin)
-    return Staff.objects.create(**kwargs)
+    staff = Staff(iin=iin, **kwargs)
+    staff.save()
+    return staff
 
 
-def update_staff(*, staff_iin, **kwargs):
-    staff = get_staff(staff_iin=staff_iin)
+def update_staff(*, staff: Staff, **kwargs):
     return update_model(model=staff, **kwargs)
 
 
-def delete_staff(*, staff_iin):
-    staff = get_staff(staff_iin=staff_iin)
+def delete_staff(*, staff: Staff):
     staff.delete()
 
 
