@@ -6,8 +6,9 @@ from rest_framework import serializers, status
 from drf_yasg.utils import swagger_auto_schema
 
 from apps.pizzas.models import Pizza
-from apps.pizzas.selectors import list_pizzas
+from apps.pizzas.selectors import list_pizzas, get_pizza
 from apps.pizzas.services import create_pizza, update_pizza, delete_pizza
+from apps.restaurants.selectors import get_restaurant
 
 
 class PizzaListApi(APIView):
@@ -28,11 +29,15 @@ class PizzaListApi(APIView):
 
 
 class PizzaCreateApi(APIView):
-    class InputSerializer(serializers.ModelSerializer):
+    class InputSerializer(serializers.Serializer):
+        restaurant = serializers.IntegerField()
+        name = serializers.CharField(max_length=128)
+        cheese = serializers.CharField(max_length=128, required=False)
+        pastry = serializers.CharField(max_length=128, required=False)
+        secret_ingredient = serializers.CharField(max_length=128, required=False)
+
         class Meta:
             ref_name = 'PizzaInputSerializer'
-            model = Pizza
-            fields = ['restaurant', 'name', 'cheese', 'pastry', 'secret_ingredient']
 
     class OutputSerializer(serializers.ModelSerializer):
         class Meta:
@@ -48,17 +53,25 @@ class PizzaCreateApi(APIView):
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        pizza = create_pizza(**serializer.validated_data)
+
+        restaurant = get_restaurant(restaurant_id=serializer.validated_data.pop('restaurant'))
+        pizza = create_pizza(
+            restaurant=restaurant,
+            **serializer.validated_data
+        )
+
         response_data = self.OutputSerializer(instance=pizza).data
         return Response(data=response_data, status=status.HTTP_201_CREATED)
 
 
 class PizzaUpdateApi(APIView):
-    class InputSerializer(serializers.ModelSerializer):
+    class InputSerializer(serializers.Serializer):
+        cheese = serializers.CharField(max_length=128, required=False)
+        pastry = serializers.CharField(max_length=128, required=False)
+        secret_ingredient = serializers.CharField(max_length=128, required=False)
+
         class Meta:
             ref_name = 'PizzaInputSerializer'
-            model = Pizza
-            fields = ['name', 'cheese', 'pastry', 'secret_ingredient']
 
     class OutputSerializer(serializers.ModelSerializer):
         class Meta:
@@ -74,7 +87,10 @@ class PizzaUpdateApi(APIView):
     def post(self, request: Request, id):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        pizza = update_pizza(pizza_id=id, **serializer.validated_data)
+
+        pizza = get_pizza(pizza_id=id)
+        pizza = update_pizza(pizza=pizza, **serializer.validated_data)
+
         response_data = self.OutputSerializer(instance=pizza).data
         return Response(data=response_data)
 
@@ -85,5 +101,6 @@ class PizzaDeleteApi(APIView):
         responses={204: ''}
     )
     def delete(self, request: Request, id):
-        delete_pizza(pizza_id=id)
+        pizza = get_pizza(pizza_id=id)
+        delete_pizza(pizza=pizza)
         return Response(status=status.HTTP_204_NO_CONTENT)
