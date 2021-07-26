@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 
 from apps.restaurants.selectors import get_restaurant
-from apps.staff import JobTextChoices, GenderTextChoices
+from apps.staff import JobChoices, GenderChoices
 from apps.staff.models import Staff
 from apps.staff.selectors import list_staff, get_staff
 from apps.staff.services import create_staff, update_staff, delete_staff
@@ -37,8 +37,8 @@ class StaffCreateApi(APIView):
         restaurant = serializers.IntegerField()
         first_name = serializers.CharField(max_length=128)
         last_name = serializers.CharField(max_length=128)
-        gender = serializers.ChoiceField(choices=GenderTextChoices)
-        job = serializers.ChoiceField(choices=JobTextChoices)
+        gender = serializers.ChoiceField(choices=GenderChoices)
+        job = serializers.ChoiceField(choices=JobChoices)
         email = serializers.EmailField()
         date_joined = serializers.DateField()
 
@@ -73,8 +73,8 @@ class StaffCreateApi(APIView):
 class StaffUpdateApi(APIView):
     class InputSerializer(serializers.Serializer):
         restaurant = serializers.IntegerField(required=False)
-        job = serializers.ChoiceField(JobTextChoices.choices, required=False)
-        gender = serializers.ChoiceField(GenderTextChoices.choices, required=False)
+        job = serializers.ChoiceField(JobChoices.choices, required=False)
+        gender = serializers.ChoiceField(GenderChoices.choices, required=False)
 
         class Meta:
             ref_name = 'StaffUpdateInputSerializer'

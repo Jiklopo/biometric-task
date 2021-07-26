@@ -2,7 +2,7 @@ from datetime import date
 from django.db import models
 from rest_framework.exceptions import ValidationError
 
-from . import GenderTextChoices, JobTextChoices
+from . import GenderChoices, JobChoices
 
 
 # Create your models here.
@@ -12,8 +12,8 @@ class Staff(models.Model):
 
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    gender = models.CharField(max_length=1, choices=GenderTextChoices.choices)
-    job = models.CharField(max_length=3, choices=JobTextChoices.choices)
+    gender = models.CharField(max_length=1, choices=GenderChoices.choices)
+    job = models.CharField(max_length=3, choices=JobChoices.choices)
 
     email = models.EmailField()
 
