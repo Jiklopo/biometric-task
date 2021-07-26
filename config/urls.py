@@ -22,6 +22,7 @@ apipatterns = [
     path('restaurants/', include('apps.restaurants.urls')),
     path('pizzas/', include('apps.pizzas.urls')),
     path('staff/', include('apps.staff.urls')),
+    path('tasks/', include('apps.taskapp.urls'))
 ]
 
 urlpatterns = [
