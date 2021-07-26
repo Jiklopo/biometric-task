@@ -1,7 +1,8 @@
 from django.db import models
 
+from apps.pizzas import PizzaStateChoices
 
-# Create your models here.
+
 class Pizza(models.Model):
     restaurant = models.ForeignKey('restaurants.Restaurant', on_delete=models.CASCADE)
 
@@ -9,6 +10,18 @@ class Pizza(models.Model):
     cheese = models.CharField(max_length=128, default='')
     pastry = models.CharField(max_length=128, default='')
     secret_ingredient = models.CharField(max_length=128, default='')
+
+    cooking_time = models.DecimalField(
+        decimal_places=1,
+        max_digits=3,
+        default=10
+    )
+
+    state = models.CharField(
+        max_length=4,
+        choices=PizzaStateChoices.choices,
+        default='RAW'
+    )
 
     def __str__(self):
         return self.name
