@@ -11,11 +11,7 @@ class Pizza(models.Model):
     pastry = models.CharField(max_length=128, default='')
     secret_ingredient = models.CharField(max_length=128, default='')
 
-    cooking_time = models.DecimalField(
-        decimal_places=1,
-        max_digits=3,
-        default=10
-    )
+    cooking_time = models.FloatField(default=10)
 
     state = models.CharField(
         max_length=4,
