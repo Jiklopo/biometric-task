@@ -5,6 +5,7 @@ from rest_framework import serializers, status
 
 from drf_yasg.utils import swagger_auto_schema
 
+from .tasks import cook_pizza
 from apps.pizzas.models import Pizza
 from apps.pizzas.selectors import list_pizzas, get_pizza
 from apps.pizzas.services import create_pizza, update_pizza, delete_pizza
@@ -20,7 +21,7 @@ class PizzaListApi(APIView):
 
     @swagger_auto_schema(
         operation_description='List Pizzas',
-        responses={200: OutputSerializer}
+        responses={200: OutputSerializer()}
     )
     def get(self, request: Request):
         pizzas = list_pizzas()
@@ -31,10 +32,13 @@ class PizzaListApi(APIView):
 class PizzaCreateApi(APIView):
     class InputSerializer(serializers.Serializer):
         restaurant = serializers.IntegerField()
+
         name = serializers.CharField(max_length=128)
         cheese = serializers.CharField(max_length=128, required=False)
         pastry = serializers.CharField(max_length=128, required=False)
         secret_ingredient = serializers.CharField(max_length=128, required=False)
+
+        cooking_time = serializers.FloatField(required=False)
 
         class Meta:
             ref_name = 'PizzaInputSerializer'
@@ -48,7 +52,7 @@ class PizzaCreateApi(APIView):
     @swagger_auto_schema(
         operation_description='Create Pizza',
         request_body=InputSerializer,
-        responses={201: OutputSerializer}
+        responses={201: OutputSerializer()}
     )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -82,7 +86,7 @@ class PizzaUpdateApi(APIView):
     @swagger_auto_schema(
         operation_description='Update Pizza',
         request_body=InputSerializer,
-        responses={200: OutputSerializer}
+        responses={200: OutputSerializer()}
     )
     def post(self, request: Request, id):
         serializer = self.InputSerializer(data=request.data)
@@ -104,3 +108,13 @@ class PizzaDeleteApi(APIView):
         pizza = get_pizza(pizza_id=id)
         delete_pizza(pizza=pizza)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PizzaCookApi(APIView):
+    def post(self, request: Request, pizza_id: int):
+        task = cook_pizza.delay(pizza_id=pizza_id)
+        response = {
+            'task_id': task.id,
+            'task_status': task.status
+        }
+        return Response(data=response)
