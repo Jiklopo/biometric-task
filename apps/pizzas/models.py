@@ -14,7 +14,7 @@ class Pizza(models.Model):
     cooking_time = models.FloatField(default=10)
 
     state = models.CharField(
-        max_length=4,
+        max_length=7,
         choices=PizzaStateChoices.choices,
         default='RAW'
     )
