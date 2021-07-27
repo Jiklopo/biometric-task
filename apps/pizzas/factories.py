@@ -25,4 +25,6 @@ class PizzaFactory(factory.django.DjangoModelFactory):
 
     @classmethod
     def create(cls, **kwargs):
-        return super().build(**kwargs)
+        instance = cls.build(**kwargs)
+        instance.save()
+        return instance
