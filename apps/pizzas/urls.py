@@ -13,5 +13,5 @@ urlpatterns = [
     path('create/', PizzaCreateApi.as_view(), name='create'),
     path('<int:id>/update/', PizzaUpdateApi.as_view(), name='update'),
     path('<int:id>/delete/', PizzaDeleteApi.as_view(), name='delete'),
-    path('<int:pizza_id>/cook/', PizzaCookApi.as_view(), name='delete'),
+    path('cook/', PizzaCookApi.as_view(), name='delete'),
 ]

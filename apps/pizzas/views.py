@@ -5,7 +5,7 @@ from rest_framework import serializers, status
 
 from drf_yasg.utils import swagger_auto_schema
 
-from .tasks import cook_pizza
+from .tasks import cook_pizzas
 from apps.pizzas.models import Pizza
 from apps.pizzas.selectors import list_pizzas, get_pizza
 from apps.pizzas.services import create_pizza, update_pizza, delete_pizza
@@ -111,8 +111,21 @@ class PizzaDeleteApi(APIView):
 
 
 class PizzaCookApi(APIView):
-    def post(self, request: Request, pizza_id: int):
-        task = cook_pizza.delay(pizza_id=pizza_id)
+    class InputSerializer(serializers.Serializer):
+        pizza_ids = serializers.ListField(child=serializers.IntegerField(), required=True)
+
+        class Meta:
+            ref_name = 'PizzaCookInputSerializer'
+        
+    @swagger_auto_schema(
+        operation_description='Cook Pizzas by ID',
+        request_body=InputSerializer
+    )
+    def post(self, request: Request):
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task = cook_pizzas.delay(pizza_ids=serializer.validated_data.get('pizza_ids'))
+        
         response = {
             'task_id': task.id,
             'task_status': task.status
