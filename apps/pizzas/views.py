@@ -116,7 +116,7 @@ class PizzaCookApi(APIView):
 
         class Meta:
             ref_name = 'PizzaCookInputSerializer'
-        
+
     @swagger_auto_schema(
         operation_description='Cook Pizzas by ID',
         request_body=InputSerializer
@@ -125,7 +125,7 @@ class PizzaCookApi(APIView):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task = cook_pizzas.delay(pizza_ids=serializer.validated_data.get('pizza_ids'))
-        
+
         response = {
             'task_id': task.id,
             'task_status': task.status

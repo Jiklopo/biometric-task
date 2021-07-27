@@ -23,7 +23,7 @@ class StaffListApi(APIView):
 
     @swagger_auto_schema(
         operation_description='List Staff',
-        responses={200: OutputSerializer}
+        responses={200: OutputSerializer()}
     )
     def get(self, request: Request):
         staff = list_staff()
@@ -56,7 +56,7 @@ class StaffCreateApi(APIView):
     @swagger_auto_schema(
         operation_description='Create Staff',
         request_body=InputSerializer,
-        responses={201: OutputSerializer}
+        responses={201: OutputSerializer()}
     )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -90,7 +90,7 @@ class StaffUpdateApi(APIView):
     @swagger_auto_schema(
         operation_description='Update Staff',
         request_body=InputSerializer,
-        responses={200: OutputSerializer}
+        responses={200: OutputSerializer()}
     )
     def post(self, request: Request, iin):
         serializer = self.InputSerializer(data=request.data)

@@ -19,7 +19,7 @@ class RestaurantsListApi(APIView):
 
     @swagger_auto_schema(
         operation_description='List Restaurants',
-        responses={200: OutputSerializer}
+        responses={200: OutputSerializer()}
     )
     def get(self, request: Request):
         restaurants = restaurants_list()
@@ -50,7 +50,7 @@ class RestaurantCreateApi(APIView):
     @swagger_auto_schema(
         operation_description='Create Restaurant',
         request_body=InputSerializer,
-        responses={201: OutputSerializer}
+        responses={201: OutputSerializer()}
     )
     def post(self, request: Request):
         serializer = self.InputSerializer(data=request.data)
@@ -79,7 +79,7 @@ class RestaurantUpdateApi(APIView):
     @swagger_auto_schema(
         operation_description='Update Restaurant',
         request_body=InputSerializer,
-        responses={200: OutputSerializer}
+        responses={200: OutputSerializer()}
     )
     def post(self, request: Request, id):
         serializer = self.InputSerializer(data=request.data)
