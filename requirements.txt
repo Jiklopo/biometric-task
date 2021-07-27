@@ -6,3 +6,5 @@ pytest
 pytest-django
 drf-yasg
 celery
+redis
+flower

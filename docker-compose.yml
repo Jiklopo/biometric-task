@@ -2,17 +2,46 @@ version: "3.9"
 
 services:
   django:
+    container_name: biometric_task_django
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-    - "8000:8000"
+      - "8000:8000"
     volumes:
-    - .:app/:rw
+      - .:/app/
+    command: python manage.py runserver 0.0.0.0:8000
 
-  rabbitmq:
-    image: "rabbitmq"
+  redis:
+    image: "redis"
     ports:
-    - "5672:5672"
+      - "6379:6379"
+    depends_on:
+      - django
 
-  celery: &django
+  celery:
+    container_name: biometric_task_celery
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app/
+    depends_on:
+      - redis
+      - django
+    command: celery -A apps.taskapp.celery worker --loglevel=INFO
+
+  flower:
+    container_name: biometric_task_flower
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - "5555:5555"
+    volumes:
+    - .:/app/
+    depends_on:
+      - django
+      - redis
+      - celery
+    command: celery -A apps.taskapp.celery flower
