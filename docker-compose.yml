@@ -29,7 +29,7 @@ services:
     depends_on:
       - redis
       - django
-    command: celery -A apps.taskapp.celery celery-dockerfile --loglevel=INFO
+    command: celery -A apps.taskapp.celery worker --loglevel=INFO
 
   flower:
     container_name: biometric_task_flower

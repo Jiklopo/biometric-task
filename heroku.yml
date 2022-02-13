@@ -16,4 +16,4 @@ release:
 
 run:
   web: gunicorn config.wsgi
-  worker: celery -A apps.taskapp.celery celery-dockerfile --loglevel=INFO
+  worker: celery -A apps.taskapp.celery worker --loglevel=INFO
