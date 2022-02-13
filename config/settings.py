@@ -1,4 +1,6 @@
+import dj_database_url
 from pathlib import Path
+from os import getenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +14,11 @@ SECRET_KEY = 'django-insecure-8z_n@h2(&zwzx@zxdwijg*renyx#t0i+(daw-(me$4dy1b+0wc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    getenv('APP_URL', '0.0.0.0')
+]
 
 # Application definition
 
@@ -74,10 +80,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3', conn_max_age=600)
 }
 
 # Password validation
@@ -117,8 +120,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Celery
-CELERY_BROKER_URL = 'redis://redis:6379'
-CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_BROKER_URL = getenv('REDIS_URL', 'redis://redis:6379')
+CELERY_RESULT_BACKEND = getenv('REDIS_URL', 'redis://redis:6379')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
